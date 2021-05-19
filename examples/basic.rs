@@ -1,4 +1,6 @@
-use vecdraw::{Circle, CirclesLayer, Layer, Line, LinesLayer, Rectangle, RectanglesLayer, run_event_loop};
+use vecdraw::{
+    run_event_loop, Circle, CirclesLayer, Layer, Line, LinesLayer, Rectangle, RectanglesLayer,
+};
 
 fn main() {
     let layers: Vec<Box<dyn Layer>> = vec![

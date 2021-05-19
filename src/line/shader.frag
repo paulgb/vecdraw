@@ -13,5 +13,5 @@ void main() {
     float ycov = min(clamp(0., 1., v_edge.y / dy), clamp(0., 1., (1. - v_edge.y) / dy));
     float alpha = xcov * ycov;
 
-    f_color = vec4(f_color.rgb * alpha, alpha);
+    f_color = vec4(v_color.rgb * alpha, alpha);
 }

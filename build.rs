@@ -5,9 +5,9 @@
 
 use anyhow::*;
 use glob::glob;
+use rayon::prelude::*;
 use std::fs::{read_to_string, write};
 use std::path::PathBuf;
-use rayon::prelude::*;
 
 struct ShaderData {
     src: String,

@@ -3,7 +3,8 @@ use std::iter;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor,
-    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferUsage, ShaderStage,
+    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferDescriptor, BufferUsage,
+    ShaderStage,
 };
 use winit::dpi::PhysicalSize;
 use winit::{
@@ -18,6 +19,7 @@ use zoom::ZoomState;
 
 pub use crate::line::{Line, LinesLayer};
 pub use crate::rectangle::{Rectangle, RectanglesLayer};
+use crate::zoom::Mat4;
 
 mod circle;
 mod layer;
@@ -141,11 +143,25 @@ impl State {
     fn render(&mut self) -> Result<(), wgpu::SwapChainError> {
         let frame = self.swap_chain.get_current_frame()?.output;
 
+        let tmp_buffer = self.device.create_buffer_init(&BufferInitDescriptor {
+            label: Some("Temporary Buffer"),
+            contents: bytemuck::cast_slice(&self.zoom_state.matrix()),
+            usage: BufferUsage::COPY_SRC,
+        });
+
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
+
+        encoder.copy_buffer_to_buffer(
+            &tmp_buffer,
+            0,
+            &self.transform_buffer,
+            0,
+            std::mem::size_of::<Mat4>() as u64,
+        );
 
         {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -165,10 +181,6 @@ impl State {
                 }],
                 depth_stencil_attachment: None,
             });
-
-            let transform = self.zoom_state.matrix();
-            self.queue
-                .write_buffer(&self.transform_buffer, 0, &bytemuck::cast_slice(&transform));
 
             for drawable in &self.drawables {
                 drawable.draw(&mut render_pass, &self.transform_bind_group);

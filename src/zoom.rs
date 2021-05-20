@@ -4,7 +4,7 @@ use winit::dpi::{PhysicalPosition, PhysicalSize};
 use winit::event::{ElementState, MouseButton, MouseScrollDelta, WindowEvent};
 use winit::window::{CursorIcon, Window};
 
-type Mat4 = [f32; 16];
+pub type Mat4 = [f32; 16];
 
 const ZOOM_FACTOR: f32 = 1.001;
 

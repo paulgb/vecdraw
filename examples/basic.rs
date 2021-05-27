@@ -1,9 +1,39 @@
-use vecdraw::{
-    run_event_loop, Circle, CirclesLayer, Layer, Line, LinesLayer, Rectangle, RectanglesLayer,
-};
+use vecdraw::{Circle, CirclesLayer, GridLayer, Hairline, HairlinesLayer, Layer, Line, LinesLayer, Orientation, Rectangle, RectanglesLayer, run_event_loop};
 
 fn main() {
     let layers: Vec<Box<dyn Layer>> = vec![
+        /*
+        Box::new(HairlinesLayer::new(vec![
+            Hairline {
+                color: [0.4, 0.4, 0.4, 1.0],
+                location: -40.,
+                orientation: Orientation::Vertical,
+                width: 0.004,
+            },
+            Hairline {
+                color: [0.4, 0.4, 0.4, 1.0],
+                location: -40.,
+                orientation: Orientation::Horizontal,
+                width: 0.004,
+            },
+            Hairline {
+                color: [0.4, 0.4, 0.4, 1.0],
+                location: 0.,
+                orientation: Orientation::Horizontal,
+                width: 0.004,
+            },
+            Hairline {
+                color: [0.4, 0.4, 0.4, 1.0],
+                location: 40.,
+                orientation: Orientation::Horizontal,
+                width: 0.004,
+            }
+        ])),
+         */
+        Box::new(GridLayer::new(
+            5, 5,
+            [0.4, 0.8, 0.7, 1.0]
+        )),
         Box::new(CirclesLayer::new(vec![
             Circle {
                 position: [-220., -220.],
@@ -42,14 +72,14 @@ fn main() {
             Line {
                 start: [450., -450.],
                 end: [200., -100.],
-                width: 3.,
-                color: [0.0, 0.0, 0.0, 1.0],
+                width: 5.,
+                color: [0.5, 0.0, 0.0, 1.0],
             },
             Line {
                 start: [-450., -450.],
                 end: [200., -100.],
                 width: 30.,
-                color: [0.0, 0.0, 0.0, 1.0],
+                color: [0.0, 0.5, 0.5, 1.0],
             },
         ])),
     ];

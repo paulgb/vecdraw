@@ -19,6 +19,8 @@ use zoom::ZoomState;
 
 pub use crate::line::{Line, LinesLayer};
 pub use crate::rectangle::{Rectangle, RectanglesLayer};
+pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
+pub use crate::grid::{GridLayer};
 use crate::zoom::Mat4;
 
 mod circle;
@@ -26,6 +28,8 @@ mod layer;
 mod line;
 mod rectangle;
 mod zoom;
+mod grid;
+mod hairline;
 
 struct State {
     surface: wgpu::Surface,

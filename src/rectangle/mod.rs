@@ -1,7 +1,7 @@
-use crate::layer::{Drawable, Layer};
+use crate::layer::{Drawable, Layer, DrawState};
 use wgpu::util::DeviceExt;
 use wgpu::{
-    BindGroup, BindGroupLayout, BlendComponent, BlendState, Buffer, Device, RenderPass,
+    BindGroupLayout, BlendComponent, BlendState, Buffer, Device,
     RenderPipeline, SwapChainDescriptor,
 };
 
@@ -30,9 +30,10 @@ pub struct RectanglesLayerDrawable {
 }
 
 impl Drawable for RectanglesLayerDrawable {
-    fn draw<'a>(&'a self, render_pass: &mut RenderPass<'a>, bind_group: &'a BindGroup) {
+    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
+        let mut render_pass = draw_state.render_pass.borrow_mut();
         render_pass.set_pipeline(&self.render_pipeline);
-        render_pass.set_bind_group(0, bind_group, &[]);
+        render_pass.set_bind_group(0, draw_state.bind_group, &[]);
         render_pass.set_vertex_buffer(0, self.instance_buffer.slice(..));
         render_pass.draw(0..6, 0..self.num_rects);
     }

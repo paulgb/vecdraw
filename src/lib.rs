@@ -21,6 +21,8 @@ pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orie
 pub use crate::line::{Line, LinesLayer};
 pub use crate::rectangle::{Rectangle, RectanglesLayer};
 use crate::zoom::Mat4;
+use crate::layer::DrawState;
+use std::cell::RefCell;
 
 mod circle;
 mod grid;
@@ -167,7 +169,7 @@ impl State {
         );
 
         {
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[wgpu::RenderPassColorAttachment {
                     view: &frame.view,
@@ -185,8 +187,13 @@ impl State {
                 depth_stencil_attachment: None,
             });
 
+            let draw_state = DrawState {
+                render_pass: RefCell::new(render_pass),
+                bind_group: &self.transform_bind_group,
+            };
+
             for drawable in &self.drawables {
-                drawable.draw(&mut render_pass, &self.transform_bind_group);
+                drawable.draw(&draw_state);
             }
         }
 

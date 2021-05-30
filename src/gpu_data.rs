@@ -1,7 +1,7 @@
 use std::cell::RefMut;
 use std::marker::PhantomData;
 use wgpu::util::DeviceExt;
-use wgpu::{Buffer, BufferSlice, CommandEncoder, Device, Queue, VertexBufferLayout};
+use wgpu::{Buffer, BufferSlice, CommandEncoder, Device, VertexBufferLayout};
 
 pub trait GpuSerializable: Sized {
     fn gpu_serialize(data: &[Self]) -> &[u8];

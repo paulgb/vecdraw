@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use wgpu::{
-    BindGroup, BindGroupLayout, CommandEncoder, Device, Queue, RenderPass, SwapChainDescriptor,
+    BindGroup, BindGroupLayout, CommandEncoder, Device, RenderPass, SwapChainDescriptor,
 };
 
 pub struct DrawContext<'a> {
@@ -26,7 +26,7 @@ pub struct UpdateState<'a> {
 }
 
 pub trait Drawable {
-    fn update(&self, update_state: &UpdateState) {}
+    fn update(&self, _update_state: &UpdateState) {}
 
     fn draw<'a>(&'a self, draw_state: &DrawState<'a>);
 }

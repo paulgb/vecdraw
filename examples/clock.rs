@@ -1,9 +1,20 @@
 use chrono::Timelike;
-use vecdraw::{run_event_loop, Circle, CirclesLayer, Drawable, Layer, Line, LinesLayer};
+use vecdraw::{run_event_loop, Circle, CirclesLayer, Drawable, Layer, Line, LinesLayer, DrawState, LinesLayerDrawable, CirclesLayerDrawable};
+use wgpu::{Device, BindGroupLayout, SwapChainDescriptor};
+
+struct ClockLayer;
+
+impl Layer for ClockLayer {
+    type D = ClockApp;
+
+    fn init_drawable(&self, device: &Device, sc_desc: &SwapChainDescriptor, transform_layout: &BindGroupLayout) -> Self::D {
+        ClockApp::new(device, sc_desc, transform_layout)
+    }
+}
 
 struct ClockApp {
-    markers: Box<dyn Drawable>,
-    hands: Box<dyn Drawable>,
+    markers: CirclesLayerDrawable,
+    hands: LinesLayerDrawable,
 }
 
 impl Drawable for ClockApp {
@@ -14,7 +25,7 @@ impl Drawable for ClockApp {
 }
 
 impl ClockApp {
-    fn new() -> Self {
+    fn new(device: &Device, sc_desc: &SwapChainDescriptor, transform_layout: &BindGroupLayout) -> Self {
         let markers = CirclesLayer::new(
             (0..12)
                 .map(|h| {
@@ -85,14 +96,13 @@ impl ClockApp {
         let hands = LinesLayer::new(vec![hour_hand, minute_hand, second_hand]);
 
         ClockApp {
-            hands: Box::new(hands.init_drawable()),
-            markers,
+            hands: hands.init_drawable(device, sc_desc, transform_layout),
+            markers: markers.init_drawable(device, sc_desc, transform_layout),
         }
     }
 }
 
 fn main() {
-    let layers: Vec<Box<dyn Layer>> = vec![Box::new(markers), Box::new(hands)];
-
-    run_event_loop(layers);
+    let layer = ClockLayer;
+    run_event_loop(layer);
 }

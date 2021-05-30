@@ -13,7 +13,7 @@ use winit::{
 };
 
 pub use circle::{Circle, CirclesLayer};
-pub use layer::{Drawable, Layer};
+pub use layer::{Drawable, Layer, DrawState};
 use zoom::ZoomState;
 
 pub use crate::grid::GridLayer;
@@ -21,7 +21,6 @@ pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orie
 pub use crate::line::{Line, LinesLayer};
 pub use crate::rectangle::{Rectangle, RectanglesLayer};
 use crate::zoom::Mat4;
-use crate::layer::DrawState;
 use std::cell::RefCell;
 
 mod circle;

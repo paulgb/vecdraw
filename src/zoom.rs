@@ -22,12 +22,12 @@ struct SceneCoordinate(pub Vector2<f32>);
 
 // Y increases going UP.
 #[derive(Debug)]
-struct GPUCoordinate(pub Vector2<f32>);
+struct GpuCoordinate(pub Vector2<f32>);
 
 impl WindowCoordinate {
-    pub fn to_gpu_coordinate(&self, size: PhysicalSize<u32>) -> GPUCoordinate {
+    pub fn to_gpu_coordinate(&self, size: PhysicalSize<u32>) -> GpuCoordinate {
         let coordinate = Vector2::new(self.0.x as f32, size.height as f32 - self.0.y as f32);
-        GPUCoordinate(
+        GpuCoordinate(
             2. * (ElementWise::div_element_wise(coordinate, size_to_vec(size)))
                 - Vector2::new(1., 1.),
         )
@@ -40,14 +40,14 @@ impl Default for WindowCoordinate {
     }
 }
 
-impl GPUCoordinate {
+impl GpuCoordinate {
     pub fn to_scene_coordinate(
         &self,
         center: SceneCoordinate,
         scale: Vector2<f32>,
         size: PhysicalSize<u32>,
     ) -> SceneCoordinate {
-        let GPUCoordinate(coordinate) = *self;
+        let GpuCoordinate(coordinate) = *self;
         SceneCoordinate(
             ElementWise::mul_element_wise(
                 ElementWise::div_element_wise(size_to_vec(size), scale),
@@ -137,7 +137,7 @@ impl ZoomState {
                     window.request_redraw();
                 }
 
-                self.last_position = WindowCoordinate(position.clone());
+                self.last_position = WindowCoordinate(*position);
 
                 true
             }

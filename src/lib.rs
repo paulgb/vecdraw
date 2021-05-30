@@ -12,27 +12,26 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 
-pub use circle::{Circle, CirclesLayer};
-pub use layer::{Drawable, Layer, DrawState};
-use zoom::ZoomState;
-
 pub use crate::grid::GridLayer;
 pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
-pub use crate::line::{Line, LinesLayer};
-pub use crate::rectangle::{Rectangle, RectanglesLayer};
+pub use crate::line::{Line, LinesLayer, LinesLayerDrawable};
+pub use crate::rectangle::{Rectangle, RectanglesLayer, RectanglesLayerDrawable};
 use crate::zoom::Mat4;
+pub use circle::{Circle, CirclesLayer, CirclesLayerDrawable};
+pub use layer::{DrawState, Drawable, Layer};
 use std::cell::RefCell;
+use zoom::ZoomState;
 
 mod circle;
+mod gpu_data;
 mod grid;
 mod hairline;
 mod layer;
 mod line;
 mod rectangle;
 mod zoom;
-mod gpu_data;
 
-struct State {
+struct State<T: Layer> {
     surface: wgpu::Surface,
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -42,12 +41,12 @@ struct State {
     transform_buffer: Buffer,
     transform_bind_group: BindGroup,
 
-    drawables: Vec<Box<dyn Drawable>>,
+    drawable: T::D,
     zoom_state: ZoomState,
 }
 
-impl State {
-    async fn new(window: &Window, layers: Vec<Box<dyn Layer>>) -> Self {
+impl<T: Layer> State<T> {
+    async fn new(window: &Window, layer: T) -> Self {
         let size = window.inner_size();
 
         let instance = wgpu::Instance::new(wgpu::BackendBit::PRIMARY);
@@ -113,10 +112,7 @@ impl State {
             }],
         });
 
-        let drawables = layers
-            .into_iter()
-            .map(|d| d.init_drawable(&device, &sc_desc, &transform_layout))
-            .collect();
+        let drawable = layer.init_drawable(&device, &sc_desc, &transform_layout);
 
         Self {
             surface,
@@ -125,7 +121,7 @@ impl State {
             size,
             sc_desc,
             swap_chain,
-            drawables,
+            drawable,
             transform_buffer,
             transform_bind_group,
             zoom_state,
@@ -192,9 +188,7 @@ impl State {
                 bind_group: &self.transform_bind_group,
             };
 
-            for drawable in &self.drawables {
-                drawable.draw(&draw_state);
-            }
+            self.drawable.draw(&draw_state);
         }
 
         self.queue.submit(iter::once(encoder.finish()));
@@ -203,7 +197,7 @@ impl State {
     }
 }
 
-pub fn run_event_loop(layers: Vec<Box<dyn Layer>>) {
+pub fn run_event_loop<T: 'static + Layer>(layer: T) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new()
@@ -217,7 +211,7 @@ pub fn run_event_loop(layers: Vec<Box<dyn Layer>>) {
 
     use futures::executor::block_on;
 
-    let mut state = block_on(State::new(&window, layers));
+    let mut state: State<T> = block_on(State::new(&window, layer));
 
     event_loop.run(move |event, _, control_flow| {
         match event {

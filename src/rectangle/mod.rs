@@ -1,7 +1,10 @@
-use crate::layer::{Drawable, Layer, DrawState};
+use crate::layer::{DrawState, Drawable, Layer};
 
-use wgpu::{BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor, VertexBufferLayout};
-use crate::gpu_data::{GPUSerializable, GPUBuffer};
+use crate::gpu_data::{GpuBuffer, GpuSerializable};
+use wgpu::{
+    BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor,
+    VertexBufferLayout,
+};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -11,7 +14,7 @@ pub struct Rectangle {
     pub color: [f32; 4],
 }
 
-impl GPUSerializable for Rectangle {
+impl GpuSerializable for Rectangle {
     fn gpu_serialize(data: &[Self]) -> &[u8] {
         bytemuck::cast_slice(data)
     }
@@ -53,7 +56,7 @@ impl RectanglesLayer {
 
 pub struct RectanglesLayerDrawable {
     render_pipeline: RenderPipeline,
-    instance_buffer: GPUBuffer<Rectangle>,
+    instance_buffer: GpuBuffer<Rectangle>,
 }
 
 impl Drawable for RectanglesLayerDrawable {
@@ -67,13 +70,15 @@ impl Drawable for RectanglesLayerDrawable {
 }
 
 impl Layer for RectanglesLayer {
+    type D = RectanglesLayerDrawable;
+
     fn init_drawable(
         &self,
         device: &Device,
         sc_desc: &SwapChainDescriptor,
         transform_layout: &BindGroupLayout,
-    ) -> Box<dyn Drawable> {
-        let instance_buffer = GPUBuffer::new(&self.data, device);
+    ) -> RectanglesLayerDrawable {
+        let instance_buffer = GpuBuffer::new(&self.data, device);
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -124,9 +129,9 @@ impl Layer for RectanglesLayer {
             },
         });
 
-        Box::new(RectanglesLayerDrawable {
+        RectanglesLayerDrawable {
             render_pipeline,
             instance_buffer,
-        })
+        }
     }
 }

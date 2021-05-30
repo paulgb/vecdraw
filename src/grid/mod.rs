@@ -1,5 +1,5 @@
-use crate::layer::{Drawable, Layer};
-use crate::{Hairline, HairlinesLayer, Orientation};
+use crate::layer::Layer;
+use crate::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
 
 use wgpu::{BindGroupLayout, Device, SwapChainDescriptor};
 
@@ -28,12 +28,14 @@ impl Default for GridLayer {
 }
 
 impl Layer for GridLayer {
+    type D = HairlinesLayerDrawable;
+
     fn init_drawable(
         &self,
         device: &Device,
         sc_desc: &SwapChainDescriptor,
         transform_layout: &BindGroupLayout,
-    ) -> Box<dyn Drawable> {
+    ) -> HairlinesLayerDrawable {
         let SwapChainDescriptor { height, width, .. } = sc_desc;
 
         let offset_x = -(*width as f32) + (*width as f32 * 2. / self.cols as f32);

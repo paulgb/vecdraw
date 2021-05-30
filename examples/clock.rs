@@ -1,5 +1,5 @@
-use vecdraw::{run_event_loop, Circle, CirclesLayer, Layer, Line, LinesLayer, Drawable};
 use chrono::Timelike;
+use vecdraw::{run_event_loop, Circle, CirclesLayer, Drawable, Layer, Line, LinesLayer};
 
 struct ClockApp {
     markers: Box<dyn Drawable>,
@@ -43,7 +43,10 @@ impl ClockApp {
 
             Line {
                 start: [0., 0.],
-                end: [hour_hand_len * hour_theta.sin(), hour_hand_len * hour_theta.cos()],
+                end: [
+                    hour_hand_len * hour_theta.sin(),
+                    hour_hand_len * hour_theta.cos(),
+                ],
                 color: [0.2, 0.4, 0.1, 1.0],
                 width: 10.,
             }
@@ -55,7 +58,10 @@ impl ClockApp {
 
             Line {
                 start: [0., 0.],
-                end: [minute_hand_len * minute_theta.sin(), minute_hand_len * minute_theta.cos()],
+                end: [
+                    minute_hand_len * minute_theta.sin(),
+                    minute_hand_len * minute_theta.cos(),
+                ],
                 color: [0.1, 0.2, 0.0, 1.0],
                 width: 5.,
             }
@@ -67,7 +73,10 @@ impl ClockApp {
 
             Line {
                 start: [0., 0.],
-                end: [second_hand_len * second_theta.sin(), second_hand_len * second_theta.cos()],
+                end: [
+                    second_hand_len * second_theta.sin(),
+                    second_hand_len * second_theta.cos(),
+                ],
                 color: [0.1, 0.2, 0.0, 1.0],
                 width: 3.,
             }
@@ -76,14 +85,13 @@ impl ClockApp {
         let hands = LinesLayer::new(vec![hour_hand, minute_hand, second_hand]);
 
         ClockApp {
-            hands: Box::new(hands.init_drawable()), markers
+            hands: Box::new(hands.init_drawable()),
+            markers,
         }
     }
 }
 
 fn main() {
-
-
     let layers: Vec<Box<dyn Layer>> = vec![Box::new(markers), Box::new(hands)];
 
     run_event_loop(layers);

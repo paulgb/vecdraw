@@ -1,20 +1,20 @@
-use wgpu::{VertexBufferLayout, Buffer, Device, BufferSlice};
-use wgpu::util::DeviceExt;
 use std::marker::PhantomData;
+use wgpu::util::DeviceExt;
+use wgpu::{Buffer, BufferSlice, Device, VertexBufferLayout};
 
-pub trait GPUSerializable: Sized {
+pub trait GpuSerializable: Sized {
     fn gpu_serialize(data: &[Self]) -> &[u8];
 
     fn buffer_layout<'a>() -> VertexBufferLayout<'a>;
 }
 
-pub struct GPUBuffer<T: GPUSerializable> {
+pub struct GpuBuffer<T: GpuSerializable> {
     buffer: Buffer,
     num_items: u32,
     _phantom: PhantomData<T>,
 }
 
-impl<T: GPUSerializable> GPUBuffer<T> {
+impl<T: GpuSerializable> GpuBuffer<T> {
     pub fn len(&self) -> u32 {
         self.num_items
     }
@@ -30,11 +30,10 @@ impl<T: GPUSerializable> GPUBuffer<T> {
             usage: wgpu::BufferUsage::VERTEX,
         });
 
-        GPUBuffer {
+        GpuBuffer {
             buffer,
             num_items: data.len() as u32,
             _phantom: Default::default(),
         }
     }
 }
-

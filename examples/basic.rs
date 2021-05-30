@@ -1,5 +1,5 @@
-use vecdraw::{run_event_loop, Circle, CirclesLayer, GridLayer, Layer, Line, LinesLayer, Rectangle, RectanglesLayer, Drawable, DrawState};
-use wgpu::{Device, BindGroupLayout, SwapChainDescriptor};
+use vecdraw::{run_event_loop, Circle, CirclesLayer, DrawState, Drawable, GridLayer, Layer, Line, LinesLayer, Rectangle, RectanglesLayer, HairlinesLayerDrawable, CirclesLayerDrawable, RectanglesLayerDrawable, LinesLayerDrawable};
+use wgpu::{BindGroupLayout, Device, SwapChainDescriptor};
 
 struct BasicApp {
     grid: GridLayer,
@@ -60,30 +60,40 @@ impl BasicApp {
                     width: 30.,
                     color: [0.0, 0.5, 0.5, 1.0],
                 },
-            ])
+            ]),
         }
-
     }
 }
 
 impl Layer for BasicApp {
-    fn init_drawable(&self, device: &Device, sc_desc: &SwapChainDescriptor, transform_layout: &BindGroupLayout) -> Box<dyn Drawable> {
-        Box::new(BasicAppDrawable {
+    type D = BasicAppDrawable;
+
+    fn init_drawable(
+        &self,
+        device: &Device,
+        sc_desc: &SwapChainDescriptor,
+        transform_layout: &BindGroupLayout,
+    ) -> BasicAppDrawable {
+        BasicAppDrawable {
             grid_drawable: self.grid.init_drawable(device, sc_desc, transform_layout),
-            circles1_drawable: self.circles1.init_drawable(device, sc_desc, transform_layout),
-            circles2_drawable: self.circles2.init_drawable(device, sc_desc, transform_layout),
+            circles1_drawable: self
+                .circles1
+                .init_drawable(device, sc_desc, transform_layout),
+            circles2_drawable: self
+                .circles2
+                .init_drawable(device, sc_desc, transform_layout),
             rects_drawable: self.rects.init_drawable(device, sc_desc, transform_layout),
             lines_drawable: self.lines.init_drawable(device, sc_desc, transform_layout),
-        })
+        }
     }
 }
 
 struct BasicAppDrawable {
-    grid_drawable: Box<dyn Drawable>,
-    circles1_drawable: Box<dyn Drawable>,
-    circles2_drawable: Box<dyn Drawable>,
-    rects_drawable: Box<dyn Drawable>,
-    lines_drawable: Box<dyn Drawable>,
+    grid_drawable: HairlinesLayerDrawable,
+    circles1_drawable: CirclesLayerDrawable,
+    circles2_drawable: CirclesLayerDrawable,
+    rects_drawable: RectanglesLayerDrawable,
+    lines_drawable: LinesLayerDrawable,
 }
 
 impl Drawable for BasicAppDrawable {
@@ -98,5 +108,5 @@ impl Drawable for BasicAppDrawable {
 
 fn main() {
     let layer = BasicApp::new();
-    run_event_loop(vec![Box::new(layer)]);
+    run_event_loop(layer);
 }

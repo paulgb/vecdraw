@@ -1,8 +1,10 @@
+use wgpu::{
+    BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor,
+    VertexBufferLayout,
+};
 
-use wgpu::{BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor, VertexBufferLayout};
-
+use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use crate::layer::{DrawState, Drawable, Layer};
-use crate::gpu_data::{GPUSerializable, GPUBuffer};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -12,7 +14,7 @@ pub struct Circle {
     pub radius: f32,
 }
 
-impl GPUSerializable for Circle {
+impl GpuSerializable for Circle {
     fn gpu_serialize(data: &[Self]) -> &[u8] {
         bytemuck::cast_slice(data)
     }
@@ -55,7 +57,7 @@ impl CirclesLayer {
 
 pub struct CirclesLayerDrawable {
     render_pipeline: RenderPipeline,
-    instance_buffer: GPUBuffer<Circle>,
+    instance_buffer: GpuBuffer<Circle>,
 }
 
 impl Drawable for CirclesLayerDrawable {
@@ -63,20 +65,21 @@ impl Drawable for CirclesLayerDrawable {
         let mut render_pass = draw_state.render_pass.borrow_mut();
         render_pass.set_pipeline(&self.render_pipeline);
         render_pass.set_bind_group(0, draw_state.bind_group, &[]);
-        render_pass
-            .set_vertex_buffer(0, self.instance_buffer.all());
+        render_pass.set_vertex_buffer(0, self.instance_buffer.all());
         render_pass.draw(0..6, 0..self.instance_buffer.len());
     }
 }
 
 impl Layer for CirclesLayer {
+    type D = CirclesLayerDrawable;
+
     fn init_drawable(
         &self,
         device: &Device,
         sc_desc: &SwapChainDescriptor,
         transform_layout: &BindGroupLayout,
-    ) -> Box<dyn Drawable> {
-        let instance_buffer = GPUBuffer::new(&self.data, device);
+    ) -> CirclesLayerDrawable {
+        let instance_buffer = GpuBuffer::new(&self.data, device);
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -127,9 +130,9 @@ impl Layer for CirclesLayer {
             },
         });
 
-        Box::new(CirclesLayerDrawable {
+        CirclesLayerDrawable {
             render_pipeline,
             instance_buffer,
-        })
+        }
     }
 }

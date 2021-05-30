@@ -1,7 +1,10 @@
 use crate::layer::{DrawState, Drawable, Layer};
 
-use wgpu::{BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor, VertexBufferLayout};
-use crate::gpu_data::{GPUSerializable, GPUBuffer};
+use crate::gpu_data::{GpuBuffer, GpuSerializable};
+use wgpu::{
+    BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor,
+    VertexBufferLayout,
+};
 
 #[repr(u32)]
 #[derive(Copy, Clone, Debug)]
@@ -22,7 +25,7 @@ pub struct Hairline {
     pub orientation: Orientation,
 }
 
-impl GPUSerializable for Hairline {
+impl GpuSerializable for Hairline {
     fn gpu_serialize(data: &[Self]) -> &[u8] {
         bytemuck::cast_slice(data)
     }
@@ -69,29 +72,29 @@ impl HairlinesLayer {
 
 pub struct HairlinesLayerDrawable {
     render_pipeline: RenderPipeline,
-    instance_buffer: GPUBuffer<Hairline>,
+    instance_buffer: GpuBuffer<Hairline>,
 }
 
 impl Drawable for HairlinesLayerDrawable {
     fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
         let mut render_pass = draw_state.render_pass.borrow_mut();
         render_pass.set_pipeline(&self.render_pipeline);
-        render_pass
-            .set_bind_group(0, draw_state.bind_group, &[]);
-        render_pass
-            .set_vertex_buffer(0, self.instance_buffer.all());
+        render_pass.set_bind_group(0, draw_state.bind_group, &[]);
+        render_pass.set_vertex_buffer(0, self.instance_buffer.all());
         render_pass.draw(0..6, 0..self.instance_buffer.len());
     }
 }
 
 impl Layer for HairlinesLayer {
+    type D = HairlinesLayerDrawable;
+
     fn init_drawable(
         &self,
         device: &Device,
         sc_desc: &SwapChainDescriptor,
         transform_layout: &BindGroupLayout,
-    ) -> Box<dyn Drawable> {
-        let instance_buffer = GPUBuffer::new(&self.data, &device);
+    ) -> HairlinesLayerDrawable {
+        let instance_buffer = GpuBuffer::new(&self.data, &device);
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -142,9 +145,9 @@ impl Layer for HairlinesLayer {
             },
         });
 
-        Box::new(HairlinesLayerDrawable {
+        HairlinesLayerDrawable {
             render_pipeline,
             instance_buffer,
-        })
+        }
     }
 }

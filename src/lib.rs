@@ -14,6 +14,7 @@ use winit::{
 
 pub use crate::grid::GridLayer;
 pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
+pub use crate::layer::DrawContext;
 pub use crate::line::{Line, LinesLayer, LinesLayerDrawable};
 pub use crate::rectangle::{Rectangle, RectanglesLayer, RectanglesLayerDrawable};
 use crate::zoom::Mat4;
@@ -112,7 +113,12 @@ impl<T: Layer> State<T> {
             }],
         });
 
-        let drawable = layer.init_drawable(&device, &sc_desc, &transform_layout);
+        let draw_context = DrawContext {
+            transform_layout: &transform_layout,
+            sc_desc: &sc_desc,
+            device: &device,
+        };
+        let drawable = layer.init_drawable(&draw_context);
 
         Self {
             surface,

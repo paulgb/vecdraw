@@ -1,7 +1,7 @@
-use crate::layer::Layer;
+use crate::layer::{DrawContext, Layer};
 use crate::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
 
-use wgpu::{BindGroupLayout, Device, SwapChainDescriptor};
+use wgpu::SwapChainDescriptor;
 
 type Color = [f32; 4];
 
@@ -30,12 +30,12 @@ impl Default for GridLayer {
 impl Layer for GridLayer {
     type D = HairlinesLayerDrawable;
 
-    fn init_drawable(
-        &self,
-        device: &Device,
-        sc_desc: &SwapChainDescriptor,
-        transform_layout: &BindGroupLayout,
-    ) -> HairlinesLayerDrawable {
+    fn init_drawable(&self, draw_context: &DrawContext) -> HairlinesLayerDrawable {
+        let DrawContext {
+            device: _,
+            sc_desc,
+            transform_layout: _,
+        } = *draw_context;
         let SwapChainDescriptor { height, width, .. } = sc_desc;
 
         let offset_x = -(*width as f32) + (*width as f32 * 2. / self.cols as f32);
@@ -61,6 +61,6 @@ impl Layer for GridLayer {
 
         let lines = HairlinesLayer::new(grid);
 
-        lines.init_drawable(device, sc_desc, transform_layout)
+        lines.init_drawable(draw_context)
     }
 }

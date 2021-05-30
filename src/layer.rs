@@ -1,15 +1,16 @@
 use std::cell::RefCell;
 use wgpu::{BindGroup, BindGroupLayout, Device, RenderPass, SwapChainDescriptor};
 
+pub struct DrawContext<'a> {
+    pub device: &'a Device,
+    pub sc_desc: &'a SwapChainDescriptor,
+    pub transform_layout: &'a BindGroupLayout,
+}
+
 pub trait Layer {
     type D: Drawable;
 
-    fn init_drawable(
-        &self,
-        device: &Device,
-        sc_desc: &SwapChainDescriptor,
-        transform_layout: &BindGroupLayout,
-    ) -> Self::D;
+    fn init_drawable(&self, draw_context: &DrawContext) -> Self::D;
 }
 
 pub struct DrawState<'a> {

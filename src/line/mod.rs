@@ -1,10 +1,7 @@
-use crate::layer::{DrawState, Drawable, Layer};
+use crate::layer::{DrawContext, DrawState, Drawable, Layer};
 
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
-use wgpu::{
-    BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor,
-    VertexBufferLayout,
-};
+use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -78,12 +75,12 @@ impl Drawable for LinesLayerDrawable {
 impl Layer for LinesLayer {
     type D = LinesLayerDrawable;
 
-    fn init_drawable(
-        &self,
-        device: &Device,
-        sc_desc: &SwapChainDescriptor,
-        transform_layout: &BindGroupLayout,
-    ) -> LinesLayerDrawable {
+    fn init_drawable(&self, draw_context: &DrawContext) -> LinesLayerDrawable {
+        let DrawContext {
+            device,
+            sc_desc,
+            transform_layout,
+        } = *draw_context;
         let instance_buffer = GpuBuffer::new(&self.data, device);
 
         let render_pipeline_layout =

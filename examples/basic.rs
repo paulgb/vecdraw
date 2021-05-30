@@ -1,5 +1,8 @@
-use vecdraw::{run_event_loop, Circle, CirclesLayer, DrawState, Drawable, GridLayer, Layer, Line, LinesLayer, Rectangle, RectanglesLayer, HairlinesLayerDrawable, CirclesLayerDrawable, RectanglesLayerDrawable, LinesLayerDrawable};
-use wgpu::{BindGroupLayout, Device, SwapChainDescriptor};
+use vecdraw::{
+    run_event_loop, Circle, CirclesLayer, CirclesLayerDrawable, DrawContext, DrawState, Drawable,
+    GridLayer, HairlinesLayerDrawable, Layer, Line, LinesLayer, LinesLayerDrawable, Rectangle,
+    RectanglesLayer, RectanglesLayerDrawable,
+};
 
 struct BasicApp {
     grid: GridLayer,
@@ -68,22 +71,13 @@ impl BasicApp {
 impl Layer for BasicApp {
     type D = BasicAppDrawable;
 
-    fn init_drawable(
-        &self,
-        device: &Device,
-        sc_desc: &SwapChainDescriptor,
-        transform_layout: &BindGroupLayout,
-    ) -> BasicAppDrawable {
+    fn init_drawable(&self, draw_context: &DrawContext) -> BasicAppDrawable {
         BasicAppDrawable {
-            grid_drawable: self.grid.init_drawable(device, sc_desc, transform_layout),
-            circles1_drawable: self
-                .circles1
-                .init_drawable(device, sc_desc, transform_layout),
-            circles2_drawable: self
-                .circles2
-                .init_drawable(device, sc_desc, transform_layout),
-            rects_drawable: self.rects.init_drawable(device, sc_desc, transform_layout),
-            lines_drawable: self.lines.init_drawable(device, sc_desc, transform_layout),
+            grid_drawable: self.grid.init_drawable(draw_context),
+            circles1_drawable: self.circles1.init_drawable(draw_context),
+            circles2_drawable: self.circles2.init_drawable(draw_context),
+            rects_drawable: self.rects.init_drawable(draw_context),
+            lines_drawable: self.lines.init_drawable(draw_context),
         }
     }
 }

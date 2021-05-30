@@ -1,6 +1,5 @@
 use clap::Clap;
-use vecdraw::{run_event_loop, Circle, CirclesLayer, Layer, CirclesLayerDrawable};
-use wgpu::{Device, BindGroupLayout, SwapChainDescriptor};
+use vecdraw::{run_event_loop, Circle, CirclesLayer, CirclesLayerDrawable, DrawContext, Layer};
 
 #[derive(Clap)]
 struct Opts {
@@ -15,7 +14,7 @@ struct GridDrawable(u32, u32);
 impl Layer for GridDrawable {
     type D = CirclesLayerDrawable;
 
-    fn init_drawable(&self, device: &Device, sc_desc: &SwapChainDescriptor, transform_layout: &BindGroupLayout) -> Self::D {
+    fn init_drawable(&self, draw_context: &DrawContext) -> Self::D {
         let GridDrawable(rows, cols) = *self;
         let circles: Vec<Circle> = (0..rows)
             .into_iter()
@@ -28,7 +27,7 @@ impl Layer for GridDrawable {
             })
             .collect();
 
-        CirclesLayer::new(circles).init_drawable(device, sc_desc, transform_layout)
+        CirclesLayer::new(circles).init_drawable(draw_context)
     }
 }
 

@@ -1,7 +1,6 @@
 use clap::Clap;
 use rand::Rng;
-use vecdraw::{run_event_loop, Layer, Line, LinesLayer, LinesLayerDrawable};
-use wgpu::{Device, BindGroupLayout, SwapChainDescriptor};
+use vecdraw::{run_event_loop, DrawContext, Layer, Line, LinesLayer, LinesLayerDrawable};
 
 const EXTENT: f32 = 10000.;
 const MAX_LEN: f32 = 1000.;
@@ -17,7 +16,7 @@ struct ManyLines(u32);
 impl Layer for ManyLines {
     type D = LinesLayerDrawable;
 
-    fn init_drawable(&self, device: &Device, sc_desc: &SwapChainDescriptor, transform_layout: &BindGroupLayout) -> Self::D {
+    fn init_drawable(&self, draw_context: &DrawContext) -> Self::D {
         let mut rand = rand::thread_rng();
         let lines: Vec<Line> = (0..self.0)
             .into_iter()
@@ -45,7 +44,7 @@ impl Layer for ManyLines {
             })
             .collect();
 
-        LinesLayer::new(lines).init_drawable(device, sc_desc, transform_layout)
+        LinesLayer::new(lines).init_drawable(draw_context)
     }
 }
 

@@ -1,8 +1,8 @@
 use crate::layer::{DrawContext, DrawState, Drawable, Layer};
 
+use crate::color::Color;
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout};
-use crate::color::Color;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -60,7 +60,7 @@ impl LinesLayer {
 
 pub struct LinesLayerDrawable {
     render_pipeline: RenderPipeline,
-    instance_buffer: GpuBuffer<Line>,
+    pub instance_buffer: GpuBuffer<Line>,
 }
 
 impl Drawable for LinesLayerDrawable {

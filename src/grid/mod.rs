@@ -1,8 +1,8 @@
 use crate::layer::{DrawContext, Layer};
 use crate::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
 
-use wgpu::SwapChainDescriptor;
 use crate::color::Color;
+use wgpu::SwapChainDescriptor;
 
 pub struct GridLayer {
     rows: u32,

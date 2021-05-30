@@ -1,8 +1,8 @@
 use crate::layer::{DrawContext, DrawState, Drawable, Layer};
 
+use crate::color::Color;
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout};
-use crate::color::Color;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]

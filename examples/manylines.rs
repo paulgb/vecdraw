@@ -1,7 +1,7 @@
 use clap::Clap;
-use rand::Rng;
-use vecdraw::{run_event_loop, DrawContext, Layer, Line, LinesLayer, LinesLayerDrawable, Color};
 use palette::Srgb;
+use rand::Rng;
+use vecdraw::{run_event_loop, Color, DrawContext, Layer, Line, LinesLayer, LinesLayerDrawable};
 
 const EXTENT: f32 = 10000.;
 const MAX_LEN: f32 = 1000.;
@@ -17,11 +17,7 @@ struct ManyLines(u32);
 fn random_color() -> Color {
     let mut rng = rand::thread_rng();
 
-    let v: Srgb<u8> = palette::Srgb::new(
-        rng.gen(),
-        rng.gen(),
-        rng.gen(),
-    );
+    let v: Srgb<u8> = palette::Srgb::new(rng.gen(), rng.gen(), rng.gen());
 
     v.into()
 }

@@ -3,7 +3,8 @@ use std::iter;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor,
-    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferUsage, ShaderStage,
+    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferUsage, CommandEncoder,
+    ShaderStage,
 };
 use winit::dpi::PhysicalSize;
 use winit::{
@@ -12,6 +13,7 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 
+pub use crate::color::Color;
 pub use crate::grid::GridLayer;
 pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
 pub use crate::layer::DrawContext;
@@ -19,10 +21,9 @@ pub use crate::line::{Line, LinesLayer, LinesLayerDrawable};
 pub use crate::rectangle::{Rectangle, RectanglesLayer, RectanglesLayerDrawable};
 use crate::zoom::Mat4;
 pub use circle::{Circle, CirclesLayer, CirclesLayerDrawable};
-pub use layer::{DrawState, Drawable, Layer};
+pub use layer::{DrawState, Drawable, Layer, UpdateState};
 use std::cell::RefCell;
 use zoom::ZoomState;
-pub use crate::color::Color;
 
 mod circle;
 mod color;
@@ -158,19 +159,31 @@ impl<T: Layer> State<T> {
             usage: BufferUsage::COPY_SRC,
         });
 
-        let mut encoder = self
+        let encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
 
-        encoder.copy_buffer_to_buffer(
+        let encoder = RefCell::new(encoder);
+
+        encoder.borrow_mut().copy_buffer_to_buffer(
             &tmp_buffer,
             0,
             &self.transform_buffer,
             0,
             std::mem::size_of::<Mat4>() as u64,
         );
+
+        {
+            let update_state = UpdateState {
+                encoder: &encoder,
+                device: &self.device,
+            };
+            self.drawable.update(&update_state);
+        }
+
+        let mut encoder: CommandEncoder = encoder.into_inner();
 
         {
             let render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -262,7 +275,10 @@ pub fn run_event_loop<T: 'static + Layer>(layer: T) {
                     Err(e) => eprintln!("{:?}", e),
                 }
             }
-            _ => *control_flow = ControlFlow::Wait,
+            Event::MainEventsCleared => {
+                window.request_redraw();
+            }
+            _ => {}
         }
     });
 }

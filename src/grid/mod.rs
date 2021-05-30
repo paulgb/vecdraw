@@ -2,8 +2,7 @@ use crate::layer::{DrawContext, Layer};
 use crate::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
 
 use wgpu::SwapChainDescriptor;
-
-type Color = [f32; 4];
+use crate::color::Color;
 
 pub struct GridLayer {
     rows: u32,
@@ -22,7 +21,7 @@ impl Default for GridLayer {
         Self {
             rows: 10,
             cols: 10,
-            color: [0.9, 0.9, 0.9, 1.0],
+            color: Color(0x000000ff),
         }
     }
 }

@@ -2,6 +2,7 @@ use crate::layer::{DrawContext, DrawState, Drawable, Layer};
 
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout};
+use crate::color::Color;
 
 #[repr(u32)]
 #[derive(Copy, Clone, Debug)]
@@ -17,7 +18,7 @@ unsafe impl bytemuck::Pod for Orientation {}
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
 pub struct Hairline {
     pub location: f32,
-    pub color: [f32; 4],
+    pub color: Color,
     pub width: f32,
     pub orientation: Orientation,
 }
@@ -40,15 +41,15 @@ impl GpuSerializable for Hairline {
                 wgpu::VertexAttribute {
                     offset: std::mem::size_of::<[f32; 1]>() as wgpu::BufferAddress,
                     shader_location: 1,
-                    format: wgpu::VertexFormat::Float32x4,
+                    format: wgpu::VertexFormat::Unorm8x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: std::mem::size_of::<[f32; 5]>() as wgpu::BufferAddress,
+                    offset: std::mem::size_of::<[f32; 2]>() as wgpu::BufferAddress,
                     shader_location: 2,
                     format: wgpu::VertexFormat::Float32,
                 },
                 wgpu::VertexAttribute {
-                    offset: std::mem::size_of::<[f32; 6]>() as wgpu::BufferAddress,
+                    offset: std::mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
                     shader_location: 3,
                     format: wgpu::VertexFormat::Uint32,
                 },

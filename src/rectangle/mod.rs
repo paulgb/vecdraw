@@ -2,13 +2,14 @@ use crate::layer::{DrawContext, DrawState, Drawable, Layer};
 
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout};
+use crate::color::Color;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
 pub struct Rectangle {
     pub upper_left: [f32; 2],
     pub bottom_right: [f32; 2],
-    pub color: [f32; 4],
+    pub color: Color,
 }
 
 impl GpuSerializable for Rectangle {
@@ -34,7 +35,7 @@ impl GpuSerializable for Rectangle {
                 wgpu::VertexAttribute {
                     offset: std::mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                     shader_location: 2,
-                    format: wgpu::VertexFormat::Float32x4,
+                    format: wgpu::VertexFormat::Unorm8x4,
                 },
             ],
         }

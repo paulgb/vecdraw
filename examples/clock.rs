@@ -36,7 +36,7 @@ impl ClockApp {
 
                     Circle {
                         radius: 20.,
-                        color: [0.5, 0.3, 0.1, 1.0],
+                        color: palette::named::DARKCYAN.into(),
                         position: [r * theta.sin(), r * theta.cos()],
                     }
                 })
@@ -60,7 +60,7 @@ impl ClockApp {
                     hour_hand_len * hour_theta.sin(),
                     hour_hand_len * hour_theta.cos(),
                 ],
-                color: [0.2, 0.4, 0.1, 1.0],
+                color: palette::named::DARKOLIVEGREEN.into(),
                 width: 10.,
             }
         };
@@ -75,7 +75,7 @@ impl ClockApp {
                     minute_hand_len * minute_theta.sin(),
                     minute_hand_len * minute_theta.cos(),
                 ],
-                color: [0.1, 0.2, 0.0, 1.0],
+                color: palette::named::DODGERBLUE.into(),
                 width: 5.,
             }
         };
@@ -90,7 +90,7 @@ impl ClockApp {
                     second_hand_len * second_theta.sin(),
                     second_hand_len * second_theta.cos(),
                 ],
-                color: [0.1, 0.2, 0.0, 1.0],
+                color: palette::named::LIGHTSLATEGRAY.into(),
                 width: 3.,
             }
         };

@@ -1,17 +1,30 @@
 use clap::Clap;
 use rand::Rng;
-use vecdraw::{run_event_loop, DrawContext, Layer, Line, LinesLayer, LinesLayerDrawable};
+use vecdraw::{run_event_loop, DrawContext, Layer, Line, LinesLayer, LinesLayerDrawable, Color};
+use palette::Srgb;
 
 const EXTENT: f32 = 10000.;
 const MAX_LEN: f32 = 1000.;
 
 #[derive(Clap)]
 struct Opts {
-    #[clap(default_value = "100")]
+    #[clap(default_value = "10000")]
     lines: u32,
 }
 
 struct ManyLines(u32);
+
+fn random_color() -> Color {
+    let mut rng = rand::thread_rng();
+
+    let v: Srgb<u8> = palette::Srgb::new(
+        rng.gen(),
+        rng.gen(),
+        rng.gen(),
+    );
+
+    v.into()
+}
 
 impl Layer for ManyLines {
     type D = LinesLayerDrawable;
@@ -31,12 +44,7 @@ impl Layer for ManyLines {
                 ];
 
                 Line {
-                    color: [
-                        rand.gen_range(0.0..1.0),
-                        rand.gen_range(0.0..1.0),
-                        rand.gen_range(0.0..1.0),
-                        1.0,
-                    ],
+                    color: random_color(),
                     start,
                     end,
                     width: rand.gen_range(1.0..100.0),

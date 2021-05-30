@@ -11,6 +11,7 @@ bytemuck = { version = "1.5.1", features = ["derive"] }
 cgmath = "0.18.0"
 env_logger = "0.8.3"
 futures = "0.3.15"
+palette = { version = "0.5.0", features = ["named"] }
 wgpu = "0.8.1"
 winit = "0.25.0"
 

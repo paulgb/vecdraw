@@ -15,39 +15,39 @@ struct BasicApp {
 impl BasicApp {
     pub fn new() -> BasicApp {
         BasicApp {
-            grid: GridLayer::new(5, 5, [0.4, 0.8, 0.7, 1.0]),
+            grid: GridLayer::new(5, 5, palette::named::PALETURQUOISE.into()),
             circles1: CirclesLayer::new(vec![
                 Circle {
                     position: [-220., -220.],
                     radius: 15.,
-                    color: [0.1, 1.0, 0.5, 1.],
+                    color: palette::named::PURPLE.into(),
                 },
                 Circle {
                     position: [300., 300.],
                     radius: 50.,
-                    color: [0.6, 0.6, 0., 1.],
+                    color: palette::named::SADDLEBROWN.into(),
                 },
                 Circle {
                     position: [-350., -350.],
                     radius: 70.,
-                    color: [0.7, 0., 0.4, 1.],
+                    color: palette::named::STEELBLUE.into(),
                 },
             ]),
             circles2: CirclesLayer::new(vec![Circle {
                 position: [500., -300.],
                 radius: 40.,
-                color: [0.3, 0.6, 0.9, 1.],
+                color: palette::named::VIOLET.into(),
             }]),
             rects: RectanglesLayer::new(vec![
                 Rectangle {
                     upper_left: [-400., 400.],
                     bottom_right: [-450., 500.],
-                    color: [0.3, 0.6, 0.4, 1.],
+                    color: palette::named::SALMON.into(),
                 },
                 Rectangle {
                     upper_left: [10., 250.],
                     bottom_right: [50., 300.],
-                    color: [0.7, 0., 0.4, 1.],
+                    color: palette::named::MAROON.into(),
                 },
             ]),
             lines: LinesLayer::new(vec![
@@ -55,13 +55,13 @@ impl BasicApp {
                     start: [450., -450.],
                     end: [200., -100.],
                     width: 5.,
-                    color: [0.5, 0.0, 0.0, 1.0],
+                    color: palette::named::LIGHTPINK.into(),
                 },
                 Line {
                     start: [-450., -450.],
                     end: [200., -100.],
                     width: 30.,
-                    color: [0.0, 0.5, 0.5, 1.0],
+                    color: palette::named::TOMATO.into(),
                 },
             ]),
         }

@@ -2,13 +2,14 @@ use crate::layer::{DrawContext, DrawState, Drawable, Layer};
 
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout};
+use crate::color::Color;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
 pub struct Line {
     pub start: [f32; 2],
     pub end: [f32; 2],
-    pub color: [f32; 4],
+    pub color: Color,
     pub width: f32,
 }
 
@@ -35,10 +36,10 @@ impl GpuSerializable for Line {
                 wgpu::VertexAttribute {
                     offset: std::mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                     shader_location: 2,
-                    format: wgpu::VertexFormat::Float32x4,
+                    format: wgpu::VertexFormat::Unorm8x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: std::mem::size_of::<[f32; 8]>() as wgpu::BufferAddress,
+                    offset: std::mem::size_of::<[f32; 5]>() as wgpu::BufferAddress,
                     shader_location: 3,
                     format: wgpu::VertexFormat::Float32,
                 },

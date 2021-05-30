@@ -22,7 +22,7 @@ impl Layer for GridDrawable {
                 (0..cols).into_iter().map(move |c| Circle {
                     position: [c as f32 * 20., r as f32 * 20.],
                     radius: 10.,
-                    color: [0.3, 0.2, 0.1, 1.0],
+                    color: palette::named::RED.into(),
                 })
             })
             .collect();

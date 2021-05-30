@@ -22,8 +22,10 @@ pub use circle::{Circle, CirclesLayer, CirclesLayerDrawable};
 pub use layer::{DrawState, Drawable, Layer};
 use std::cell::RefCell;
 use zoom::ZoomState;
+pub use crate::color::Color;
 
 mod circle;
+mod color;
 mod gpu_data;
 mod grid;
 mod hairline;

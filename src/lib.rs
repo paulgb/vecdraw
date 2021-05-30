@@ -3,8 +3,7 @@ use std::iter;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor,
-    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferUsage,
-    ShaderStage,
+    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferUsage, ShaderStage,
 };
 use winit::dpi::PhysicalSize;
 use winit::{
@@ -17,19 +16,19 @@ pub use circle::{Circle, CirclesLayer};
 pub use layer::{Drawable, Layer};
 use zoom::ZoomState;
 
+pub use crate::grid::GridLayer;
+pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
 pub use crate::line::{Line, LinesLayer};
 pub use crate::rectangle::{Rectangle, RectanglesLayer};
-pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
-pub use crate::grid::{GridLayer};
 use crate::zoom::Mat4;
 
 mod circle;
+mod grid;
+mod hairline;
 mod layer;
 mod line;
 mod rectangle;
 mod zoom;
-mod grid;
-mod hairline;
 
 struct State {
     surface: wgpu::Surface,

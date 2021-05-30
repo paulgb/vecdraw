@@ -1,10 +1,8 @@
-use wgpu::util::DeviceExt;
-use wgpu::{
-    BindGroupLayout, BlendComponent, BlendState, Buffer, Device, RenderPipeline,
-    SwapChainDescriptor,
-};
+
+use wgpu::{BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor, VertexBufferLayout};
 
 use crate::layer::{DrawState, Drawable, Layer};
+use crate::gpu_data::{GPUSerializable, GPUBuffer};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -14,42 +12,13 @@ pub struct Circle {
     pub radius: f32,
 }
 
-#[derive(Debug)]
-pub struct CirclesLayer {
-    data: Vec<Circle>,
-}
-
-impl CirclesLayer {
-    pub fn new(data: Vec<Circle>) -> Self {
-        CirclesLayer { data }
+impl GPUSerializable for Circle {
+    fn gpu_serialize(data: &[Self]) -> &[u8] {
+        bytemuck::cast_slice(data)
     }
-}
 
-pub struct CirclesLayerDrawable {
-    render_pipeline: RenderPipeline,
-    instance_buffer: Buffer,
-    num_circles: u32,
-}
-
-impl Drawable for CirclesLayerDrawable {
-    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
-        let mut render_pass = draw_state.render_pass.borrow_mut();
-        render_pass.set_pipeline(&self.render_pipeline);
-        render_pass.set_bind_group(0, draw_state.bind_group, &[]);
-        render_pass
-            .set_vertex_buffer(0, self.instance_buffer.slice(..));
-        render_pass.draw(0..6, 0..self.num_circles);
-    }
-}
-
-impl Layer for CirclesLayer {
-    fn init_drawable(
-        &self,
-        device: &Device,
-        sc_desc: &SwapChainDescriptor,
-        transform_layout: &BindGroupLayout,
-    ) -> Box<dyn Drawable> {
-        let instance_buffer_desc = wgpu::VertexBufferLayout {
+    fn buffer_layout<'a>() -> VertexBufferLayout<'a> {
+        wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Circle>() as wgpu::BufferAddress,
             step_mode: wgpu::InputStepMode::Instance,
             attributes: &[
@@ -69,13 +38,45 @@ impl Layer for CirclesLayer {
                     format: wgpu::VertexFormat::Float32,
                 },
             ],
-        };
+        }
+    }
+}
 
-        let instance_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Instance buffer"),
-            contents: bytemuck::cast_slice(&self.data),
-            usage: wgpu::BufferUsage::VERTEX,
-        });
+#[derive(Debug)]
+pub struct CirclesLayer {
+    data: Vec<Circle>,
+}
+
+impl CirclesLayer {
+    pub fn new(data: Vec<Circle>) -> Self {
+        CirclesLayer { data }
+    }
+}
+
+pub struct CirclesLayerDrawable {
+    render_pipeline: RenderPipeline,
+    instance_buffer: GPUBuffer<Circle>,
+}
+
+impl Drawable for CirclesLayerDrawable {
+    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
+        let mut render_pass = draw_state.render_pass.borrow_mut();
+        render_pass.set_pipeline(&self.render_pipeline);
+        render_pass.set_bind_group(0, draw_state.bind_group, &[]);
+        render_pass
+            .set_vertex_buffer(0, self.instance_buffer.all());
+        render_pass.draw(0..6, 0..self.instance_buffer.len());
+    }
+}
+
+impl Layer for CirclesLayer {
+    fn init_drawable(
+        &self,
+        device: &Device,
+        sc_desc: &SwapChainDescriptor,
+        transform_layout: &BindGroupLayout,
+    ) -> Box<dyn Drawable> {
+        let instance_buffer = GPUBuffer::new(&self.data, device);
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -93,7 +94,7 @@ impl Layer for CirclesLayer {
             vertex: wgpu::VertexState {
                 module: &vs_module,
                 entry_point: "main",
-                buffers: &[instance_buffer_desc],
+                buffers: &[Circle::buffer_layout()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &fs_module,
@@ -129,7 +130,6 @@ impl Layer for CirclesLayer {
         Box::new(CirclesLayerDrawable {
             render_pipeline,
             instance_buffer,
-            num_circles: self.data.len() as u32,
         })
     }
 }

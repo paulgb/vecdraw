@@ -1,9 +1,7 @@
 use crate::layer::{DrawState, Drawable, Layer};
-use wgpu::util::DeviceExt;
-use wgpu::{
-    BindGroupLayout, BlendComponent, BlendState, Buffer, Device, RenderPipeline,
-    SwapChainDescriptor,
-};
+
+use wgpu::{BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor, VertexBufferLayout};
+use crate::gpu_data::{GPUSerializable, GPUBuffer};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -14,42 +12,13 @@ pub struct Line {
     pub width: f32,
 }
 
-pub struct LinesLayer {
-    data: Vec<Line>,
-}
-
-impl LinesLayer {
-    pub fn new(data: Vec<Line>) -> Self {
-        LinesLayer { data }
+impl GPUSerializable for Line {
+    fn gpu_serialize(data: &[Self]) -> &[u8] {
+        bytemuck::cast_slice(data)
     }
-}
 
-pub struct LinesLayerDrawable {
-    render_pipeline: RenderPipeline,
-    instance_buffer: Buffer,
-    num_lines: u32,
-}
-
-impl Drawable for LinesLayerDrawable {
-    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
-        let mut render_pass = draw_state.render_pass.borrow_mut();
-        render_pass.set_pipeline(&self.render_pipeline);
-        render_pass
-            .set_bind_group(0, draw_state.bind_group, &[]);
-        render_pass
-            .set_vertex_buffer(0, self.instance_buffer.slice(..));
-        render_pass.draw(0..6, 0..self.num_lines);
-    }
-}
-
-impl Layer for LinesLayer {
-    fn init_drawable(
-        &self,
-        device: &Device,
-        sc_desc: &SwapChainDescriptor,
-        transform_layout: &BindGroupLayout,
-    ) -> Box<dyn Drawable> {
-        let instance_buffer_desc = wgpu::VertexBufferLayout {
+    fn buffer_layout<'a>() -> VertexBufferLayout<'a> {
+        wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Line>() as wgpu::BufferAddress,
             step_mode: wgpu::InputStepMode::Instance,
             attributes: &[
@@ -74,13 +43,45 @@ impl Layer for LinesLayer {
                     format: wgpu::VertexFormat::Float32,
                 },
             ],
-        };
+        }
+    }
+}
 
-        let instance_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Instance buffer"),
-            contents: bytemuck::cast_slice(&self.data),
-            usage: wgpu::BufferUsage::VERTEX,
-        });
+pub struct LinesLayer {
+    data: Vec<Line>,
+}
+
+impl LinesLayer {
+    pub fn new(data: Vec<Line>) -> Self {
+        LinesLayer { data }
+    }
+}
+
+pub struct LinesLayerDrawable {
+    render_pipeline: RenderPipeline,
+    instance_buffer: GPUBuffer<Line>,
+}
+
+impl Drawable for LinesLayerDrawable {
+    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
+        let mut render_pass = draw_state.render_pass.borrow_mut();
+        render_pass.set_pipeline(&self.render_pipeline);
+        render_pass
+            .set_bind_group(0, draw_state.bind_group, &[]);
+        render_pass
+            .set_vertex_buffer(0, self.instance_buffer.all());
+        render_pass.draw(0..6, 0..self.instance_buffer.len());
+    }
+}
+
+impl Layer for LinesLayer {
+    fn init_drawable(
+        &self,
+        device: &Device,
+        sc_desc: &SwapChainDescriptor,
+        transform_layout: &BindGroupLayout,
+    ) -> Box<dyn Drawable> {
+        let instance_buffer = GPUBuffer::new(&self.data, device);
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -98,7 +99,7 @@ impl Layer for LinesLayer {
             vertex: wgpu::VertexState {
                 module: &vs_module,
                 entry_point: "main",
-                buffers: &[instance_buffer_desc],
+                buffers: &[Line::buffer_layout()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &fs_module,
@@ -134,7 +135,6 @@ impl Layer for LinesLayer {
         Box::new(LinesLayerDrawable {
             render_pipeline,
             instance_buffer,
-            num_lines: self.data.len() as u32,
         })
     }
 }

@@ -31,6 +31,7 @@ mod layer;
 mod line;
 mod rectangle;
 mod zoom;
+mod gpu_data;
 
 struct State {
     surface: wgpu::Surface,

@@ -1,9 +1,7 @@
 use crate::layer::{Drawable, Layer, DrawState};
-use wgpu::util::DeviceExt;
-use wgpu::{
-    BindGroupLayout, BlendComponent, BlendState, Buffer, Device,
-    RenderPipeline, SwapChainDescriptor,
-};
+
+use wgpu::{BindGroupLayout, BlendComponent, BlendState, Device, RenderPipeline, SwapChainDescriptor, VertexBufferLayout};
+use crate::gpu_data::{GPUSerializable, GPUBuffer};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -13,40 +11,13 @@ pub struct Rectangle {
     pub color: [f32; 4],
 }
 
-pub struct RectanglesLayer {
-    data: Vec<Rectangle>,
-}
-
-impl RectanglesLayer {
-    pub fn new(data: Vec<Rectangle>) -> Self {
-        RectanglesLayer { data }
+impl GPUSerializable for Rectangle {
+    fn gpu_serialize(data: &[Self]) -> &[u8] {
+        bytemuck::cast_slice(data)
     }
-}
 
-pub struct RectanglesLayerDrawable {
-    render_pipeline: RenderPipeline,
-    instance_buffer: Buffer,
-    num_rects: u32,
-}
-
-impl Drawable for RectanglesLayerDrawable {
-    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
-        let mut render_pass = draw_state.render_pass.borrow_mut();
-        render_pass.set_pipeline(&self.render_pipeline);
-        render_pass.set_bind_group(0, draw_state.bind_group, &[]);
-        render_pass.set_vertex_buffer(0, self.instance_buffer.slice(..));
-        render_pass.draw(0..6, 0..self.num_rects);
-    }
-}
-
-impl Layer for RectanglesLayer {
-    fn init_drawable(
-        &self,
-        device: &Device,
-        sc_desc: &SwapChainDescriptor,
-        transform_layout: &BindGroupLayout,
-    ) -> Box<dyn Drawable> {
-        let instance_buffer_desc = wgpu::VertexBufferLayout {
+    fn buffer_layout<'a>() -> VertexBufferLayout<'a> {
+        wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Rectangle>() as wgpu::BufferAddress,
             step_mode: wgpu::InputStepMode::Instance,
             attributes: &[
@@ -66,13 +37,43 @@ impl Layer for RectanglesLayer {
                     format: wgpu::VertexFormat::Float32x4,
                 },
             ],
-        };
+        }
+    }
+}
 
-        let instance_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Instance buffer"),
-            contents: bytemuck::cast_slice(&self.data),
-            usage: wgpu::BufferUsage::VERTEX,
-        });
+pub struct RectanglesLayer {
+    data: Vec<Rectangle>,
+}
+
+impl RectanglesLayer {
+    pub fn new(data: Vec<Rectangle>) -> Self {
+        RectanglesLayer { data }
+    }
+}
+
+pub struct RectanglesLayerDrawable {
+    render_pipeline: RenderPipeline,
+    instance_buffer: GPUBuffer<Rectangle>,
+}
+
+impl Drawable for RectanglesLayerDrawable {
+    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
+        let mut render_pass = draw_state.render_pass.borrow_mut();
+        render_pass.set_pipeline(&self.render_pipeline);
+        render_pass.set_bind_group(0, draw_state.bind_group, &[]);
+        render_pass.set_vertex_buffer(0, self.instance_buffer.all());
+        render_pass.draw(0..6, 0..self.instance_buffer.len());
+    }
+}
+
+impl Layer for RectanglesLayer {
+    fn init_drawable(
+        &self,
+        device: &Device,
+        sc_desc: &SwapChainDescriptor,
+        transform_layout: &BindGroupLayout,
+    ) -> Box<dyn Drawable> {
+        let instance_buffer = GPUBuffer::new(&self.data, device);
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -90,7 +91,7 @@ impl Layer for RectanglesLayer {
             vertex: wgpu::VertexState {
                 module: &vs_module,
                 entry_point: "main",
-                buffers: &[instance_buffer_desc],
+                buffers: &[Rectangle::buffer_layout()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &fs_module,
@@ -126,7 +127,6 @@ impl Layer for RectanglesLayer {
         Box::new(RectanglesLayerDrawable {
             render_pipeline,
             instance_buffer,
-            num_rects: self.data.len() as u32,
         })
     }
 }

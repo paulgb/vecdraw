@@ -1,7 +1,7 @@
-use crate::{Hairline, HairlinesLayer, LinesLayer, Orientation};
+use crate::{Hairline, HairlinesLayer, Orientation};
 use crate::layer::{Drawable, Layer};
-use crate::line::LinesLayerDrawable;
-use wgpu::util::DeviceExt;
+
+
 use wgpu::{
     BindGroup, BindGroupLayout, BlendComponent, BlendState, Buffer, Device, RenderPass,
     RenderPipeline, SwapChainDescriptor,

@@ -1,5 +1,5 @@
 use clap::Clap;
-use vecdraw::{run_event_loop, Circle, CirclesLayer, Layer, Rectangle, RectanglesLayer};
+use vecdraw::{run_event_loop, Circle, CirclesLayer, Layer};
 
 #[derive(Clap)]
 struct Opts {

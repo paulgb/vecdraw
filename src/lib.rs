@@ -3,7 +3,7 @@ use std::iter;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::{
     BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayoutDescriptor,
-    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferDescriptor, BufferUsage,
+    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferUsage,
     ShaderStage,
 };
 use winit::dpi::PhysicalSize;

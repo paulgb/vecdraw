@@ -4,18 +4,18 @@ use palette::{Srgb, Srgba};
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
 pub struct Color(pub u32);
 
-impl Into<Color> for Srgb<u8> {
-    fn into(self) -> Color {
+impl From<Srgb<u8>> for Color {
+    fn from(srgb: Srgb<u8>) -> Self {
         Color(*bytemuck::from_bytes(&[
-            self.red, self.green, self.blue, 0xff,
+            srgb.red, srgb.green, srgb.blue, 0xff,
         ]))
     }
 }
 
-impl Into<Color> for Srgba<u8> {
-    fn into(self) -> Color {
+impl From<Srgba<u8>> for Color {
+    fn from(srgba: Srgba<u8>) -> Self {
         Color(*bytemuck::from_bytes(&[
-            self.red, self.green, self.blue, self.alpha,
+            srgba.red, srgba.green, srgba.blue, srgba.alpha
         ]))
     }
 }

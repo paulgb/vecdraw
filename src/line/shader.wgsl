@@ -27,28 +27,28 @@ fn vs_main(
     let perp: vec2<f32> = vec2<f32>(line.y, -line.x);
 
     switch (i32(in_vertex_index)) {
-        case 0u: {
+        case 0: {
             let c: vec2<f32> = start - perp * width;
             out.position = vec4<f32>(c, 0., 1.);
             out.edge = vec2<f32>(0., 0.);
         }
-        case 1u: {
+        case 1: {
             fallthrough;
         }
-        case 3u: {
+        case 3: {
             let c: vec2<f32> = start + perp * width;
             out.position = vec4<f32>(c, 0., 1.);
             out.edge = vec2<f32>(0., 1.);
         }
-        case 2u: {
+        case 2: {
             fallthrough;
         }
-        case 4u: {
+        case 4: {
             let c: vec2<f32> = end - perp * width;
             out.position = vec4<f32>(c, 0., 1.);
             out.edge = vec2<f32>(1., 0.);
         }
-        case 5u: {
+        case 5: {
             let c: vec2<f32> = end + perp * width;
             out.position = vec4<f32>(c, 0., 1.);
             out.edge = vec2<f32>(0., 0.);

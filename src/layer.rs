@@ -30,3 +30,23 @@ pub trait Drawable {
 
     fn draw<'a>(&'a self, draw_state: &DrawState<'a>);
 }
+
+pub struct GroupLayerDrawable {
+    drawables: Vec<Box<dyn Drawable>>,
+}
+
+impl GroupLayerDrawable {
+    pub fn new(drawables: Vec<Box<dyn Drawable>>) -> Self {
+        GroupLayerDrawable {
+            drawables
+        }
+    }
+}
+
+impl Drawable for GroupLayerDrawable {
+    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
+        for drawable in &self.drawables {
+            drawable.draw(draw_state);
+        }
+    }
+}

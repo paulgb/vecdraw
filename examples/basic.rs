@@ -1,7 +1,7 @@
 use vecdraw::{
-    run_event_loop, Circle, CirclesLayer, CirclesLayerDrawable, DrawContext, DrawState, Drawable,
-    GridLayer, HairlinesLayerDrawable, Layer, Line, LinesLayer, LinesLayerDrawable, Rectangle,
-    RectanglesLayer, RectanglesLayerDrawable,
+    run_event_loop, Circle, CirclesLayer, DrawContext,
+    GridLayer, Layer, Line, LinesLayer, Rectangle,
+    RectanglesLayer, GroupLayerDrawable
 };
 
 struct BasicApp {
@@ -69,34 +69,16 @@ impl BasicApp {
 }
 
 impl Layer for BasicApp {
-    type D = BasicAppDrawable;
+    type D = GroupLayerDrawable;
 
-    fn init_drawable(&self, draw_context: &DrawContext) -> BasicAppDrawable {
-        BasicAppDrawable {
-            grid_drawable: self.grid.init_drawable(draw_context),
-            circles1_drawable: self.circles1.init_drawable(draw_context),
-            circles2_drawable: self.circles2.init_drawable(draw_context),
-            rects_drawable: self.rects.init_drawable(draw_context),
-            lines_drawable: self.lines.init_drawable(draw_context),
-        }
-    }
-}
-
-struct BasicAppDrawable {
-    grid_drawable: HairlinesLayerDrawable,
-    circles1_drawable: CirclesLayerDrawable,
-    circles2_drawable: CirclesLayerDrawable,
-    rects_drawable: RectanglesLayerDrawable,
-    lines_drawable: LinesLayerDrawable,
-}
-
-impl Drawable for BasicAppDrawable {
-    fn draw<'a>(&'a self, draw_state: &DrawState<'a>) {
-        self.grid_drawable.draw(draw_state);
-        self.circles1_drawable.draw(draw_state);
-        self.circles2_drawable.draw(draw_state);
-        self.rects_drawable.draw(draw_state);
-        self.lines_drawable.draw(draw_state);
+    fn init_drawable(&self, draw_context: &DrawContext) -> GroupLayerDrawable {
+        GroupLayerDrawable::new(vec![
+            Box::new(self.grid.init_drawable(draw_context)),
+            Box::new(self.circles1.init_drawable(draw_context)),
+            Box::new(self.circles2.init_drawable(draw_context)),
+            Box::new(self.rects.init_drawable(draw_context)),
+            Box::new(self.lines.init_drawable(draw_context)),
+        ])
     }
 }
 

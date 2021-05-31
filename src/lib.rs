@@ -16,7 +16,7 @@ use winit::{
 pub use crate::color::Color;
 pub use crate::grid::GridLayer;
 pub use crate::hairline::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
-pub use crate::layer::DrawContext;
+pub use crate::layer::{DrawContext, GroupLayerDrawable};
 pub use crate::line::{Line, LinesLayer, LinesLayerDrawable};
 pub use crate::rectangle::{Rectangle, RectanglesLayer, RectanglesLayerDrawable};
 use crate::zoom::Mat4;

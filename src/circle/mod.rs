@@ -1,8 +1,9 @@
-use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout};
+use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout, ShaderModuleDescriptor, ShaderSource};
 
 use crate::color::Color;
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use crate::layer::{DrawContext, DrawState, Drawable, Layer};
+use std::borrow::Cow;
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Zeroable, bytemuck::Pod)]
@@ -86,20 +87,23 @@ impl Layer for CirclesLayer {
                 push_constant_ranges: &[],
             });
 
-        let vs_module = device.create_shader_module(&wgpu::include_spirv!("shader.vert.spv"));
-        let fs_module = device.create_shader_module(&wgpu::include_spirv!("shader.frag.spv"));
+        let shader_module = device.create_shader_module(&ShaderModuleDescriptor {
+            label: None,
+            source: ShaderSource::Wgsl(Cow::Borrowed(include_str!("shader.wgsl"))),
+            flags: Default::default()
+        });
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
-                module: &vs_module,
-                entry_point: "main",
+                module: &shader_module,
+                entry_point: "vs_main",
                 buffers: &[Circle::buffer_layout()],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &fs_module,
-                entry_point: "main",
+                module: &shader_module,
+                entry_point: "fs_main",
                 targets: &[wgpu::ColorTargetState {
                     format: sc_desc.format,
                     write_mask: wgpu::ColorWrite::ALL,

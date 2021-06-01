@@ -15,7 +15,10 @@ impl From<Srgb<u8>> for Color {
 impl From<Srgba<u8>> for Color {
     fn from(srgba: Srgba<u8>) -> Self {
         Color(*bytemuck::from_bytes(&[
-            srgba.red, srgba.green, srgba.blue, srgba.alpha
+            srgba.red,
+            srgba.green,
+            srgba.blue,
+            srgba.alpha,
         ]))
     }
 }

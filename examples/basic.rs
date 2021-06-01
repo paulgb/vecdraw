@@ -1,7 +1,6 @@
 use vecdraw::{
-    run_event_loop, Circle, CirclesLayer, DrawContext,
-    GridLayer, Layer, Line, LinesLayer, Rectangle,
-    RectanglesLayer, GroupLayerDrawable
+    run_event_loop, Circle, CirclesLayer, DrawContext, GridLayer, GroupLayerDrawable, Layer, Line,
+    LinesLayer, Rectangle, RectanglesLayer,
 };
 
 struct BasicApp {

@@ -1,7 +1,5 @@
 use std::cell::RefCell;
-use wgpu::{
-    BindGroup, BindGroupLayout, CommandEncoder, Device, RenderPass, SwapChainDescriptor,
-};
+use wgpu::{BindGroup, BindGroupLayout, CommandEncoder, Device, RenderPass, SwapChainDescriptor};
 
 pub struct DrawContext<'a> {
     pub device: &'a Device,
@@ -37,9 +35,7 @@ pub struct GroupLayerDrawable {
 
 impl GroupLayerDrawable {
     pub fn new(drawables: Vec<Box<dyn Drawable>>) -> Self {
-        GroupLayerDrawable {
-            drawables
-        }
+        GroupLayerDrawable { drawables }
     }
 }
 

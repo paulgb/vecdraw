@@ -1,4 +1,7 @@
-use wgpu::{BlendComponent, BlendState, RenderPipeline, VertexBufferLayout, ShaderModuleDescriptor, ShaderSource};
+use wgpu::{
+    BlendComponent, BlendState, RenderPipeline, ShaderModuleDescriptor, ShaderSource,
+    VertexBufferLayout,
+};
 
 use crate::color::Color;
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
@@ -90,7 +93,7 @@ impl Layer for CirclesLayer {
         let shader_module = device.create_shader_module(&ShaderModuleDescriptor {
             label: None,
             source: ShaderSource::Wgsl(Cow::Borrowed(include_str!("shader.wgsl"))),
-            flags: Default::default()
+            flags: Default::default(),
         });
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {

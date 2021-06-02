@@ -24,7 +24,7 @@ pub struct UpdateState<'a> {
 }
 
 pub trait Drawable {
-    fn update(&self, _update_state: &UpdateState) {}
+    fn update(&mut self, _update_state: &UpdateState) {}
 
     fn draw<'a>(&'a self, draw_state: &DrawState<'a>);
 }

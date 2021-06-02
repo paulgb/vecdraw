@@ -61,7 +61,7 @@ impl CirclesLayer {
 
 pub struct CirclesLayerDrawable {
     render_pipeline: RenderPipeline,
-    instance_buffer: GpuBuffer<Circle>,
+    pub instance_buffer: GpuBuffer<Circle>,
 }
 
 impl Drawable for CirclesLayerDrawable {

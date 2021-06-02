@@ -20,7 +20,7 @@ struct ClockApp {
 }
 
 impl Drawable for ClockApp {
-    fn update(&self, update_state: &UpdateState) {
+    fn update(&mut self, update_state: &UpdateState) {
         self.hands.instance_buffer.update(
             &Self::hand_data(),
             update_state.device,

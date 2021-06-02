@@ -1,4 +1,5 @@
 use crate::layer::{DrawContext, DrawState, Drawable, Layer};
+use crate::{GenericDrawable, GenericLayer};
 
 use crate::color::Color;
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
@@ -94,7 +95,7 @@ impl Layer for RectanglesLayer {
             source: ShaderSource::Wgsl(Cow::Borrowed(include_str!("shader.wgsl"))),
             flags: Default::default(),
         });
-        
+
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
             layout: Some(&render_pipeline_layout),
@@ -138,5 +139,11 @@ impl Layer for RectanglesLayer {
             render_pipeline,
             instance_buffer,
         }
+    }
+}
+
+impl GenericLayer for RectanglesLayer {
+    fn init_drawable_generic(&self, draw_context: &DrawContext) -> crate::GenericDrawable {
+        GenericDrawable::new(self.init_drawable(draw_context))
     }
 }

@@ -1,5 +1,7 @@
 use crate::layer::{DrawContext, Layer};
-use crate::{Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation};
+use crate::{
+    GenericDrawable, GenericLayer, Hairline, HairlinesLayer, HairlinesLayerDrawable, Orientation,
+};
 
 use crate::color::Color;
 use wgpu::SwapChainDescriptor;
@@ -61,5 +63,11 @@ impl Layer for GridLayer {
         let lines = HairlinesLayer::new(grid);
 
         lines.init_drawable(draw_context)
+    }
+}
+
+impl GenericLayer for GridLayer {
+    fn init_drawable_generic(&self, draw_context: &DrawContext) -> crate::GenericDrawable {
+        GenericDrawable::new(self.init_drawable(draw_context))
     }
 }

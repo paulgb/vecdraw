@@ -6,6 +6,8 @@ use wgpu::{
 use crate::color::Color;
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
 use crate::layer::{DrawContext, DrawState, Drawable, Layer};
+use crate::GenericDrawable;
+use crate::GenericLayer;
 use std::borrow::Cow;
 
 #[repr(C)]
@@ -69,6 +71,12 @@ impl Drawable for CirclesLayerDrawable {
         render_pass.set_bind_group(0, draw_state.bind_group, &[]);
         render_pass.set_vertex_buffer(0, self.instance_buffer.all());
         render_pass.draw(0..6, 0..self.instance_buffer.len());
+    }
+}
+
+impl GenericLayer for CirclesLayer {
+    fn init_drawable_generic(&self, draw_context: &DrawContext) -> crate::GenericDrawable {
+        GenericDrawable::new(self.init_drawable(draw_context))
     }
 }
 

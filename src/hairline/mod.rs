@@ -1,4 +1,5 @@
 use crate::layer::{DrawContext, DrawState, Drawable, Layer};
+use crate::{GenericDrawable, GenericLayer};
 
 use crate::color::Color;
 use crate::gpu_data::{GpuBuffer, GpuSerializable};
@@ -154,5 +155,11 @@ impl Layer for HairlinesLayer {
             render_pipeline,
             instance_buffer,
         }
+    }
+}
+
+impl GenericLayer for HairlinesLayer {
+    fn init_drawable_generic(&self, draw_context: &DrawContext) -> crate::GenericDrawable {
+        GenericDrawable::new(self.init_drawable(draw_context))
     }
 }

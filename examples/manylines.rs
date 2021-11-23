@@ -1,4 +1,4 @@
-use clap::Clap;
+use clap::Parser;
 use palette::Srgb;
 use rand::Rng;
 use vecdraw::{run_event_loop, Color, DrawContext, Layer, Line, LinesLayer, LinesLayerDrawable};
@@ -6,7 +6,7 @@ use vecdraw::{run_event_loop, Color, DrawContext, Layer, Line, LinesLayer, Lines
 const EXTENT: f32 = 10000.;
 const MAX_LEN: f32 = 1000.;
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Opts {
     #[clap(default_value = "10000")]
     lines: u32,

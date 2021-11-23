@@ -1,7 +1,7 @@
-use clap::Clap;
+use clap::Parser;
 use vecdraw::{run_event_loop, Circle, CirclesLayer, CirclesLayerDrawable, DrawContext, Layer};
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Opts {
     #[clap(default_value = "10")]
     rows: u32,
